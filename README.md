@@ -8,8 +8,8 @@
 GrandLineX is an out-of-the-box server framework for ElectronJs and ExpressJs.
 
 
-[![GitHub](https://badge.fury.io/gh/grandlinex%2Feasy-script.svg)](https://github.com/GrandlineX/easy-script)
-[![NPM](https://img.shields.io/static/v1?label=NPM&message=Package&color=red&logo=NPM)](https://www.npmjs.com/package/@grandlinex/easy-script)
+[![GitHub](https://badge.fury.io/gh/grandlinex%2Feasy-cli.svg)](https://github.com/GrandlineX/easy-cli)
+[![NPM](https://img.shields.io/static/v1?label=NPM&message=Package&color=red&logo=NPM)](https://www.npmjs.com/package/@grandlinex/easy-cli)
 ![TS](https://img.shields.io/static/v1?label=Language&message=TypeScript&color=blue&logo=TypeScript)
 
 ### Status
@@ -27,5 +27,5 @@ GrandLineX is an out-of-the-box server framework for ElectronJs and ExpressJs.
 
 
 ## Documentation
-- [Documentation](https://grandlinex.github.io/easy-script/) 
+- [Documentation](https://grandlinex.github.io/easy-cli/) 
 - [GrandLineX Docs](https://grandlinex.github.io/docs/)
