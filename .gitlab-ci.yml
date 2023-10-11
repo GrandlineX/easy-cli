@@ -14,4 +14,4 @@ include:
   - project: 'grandlinex/templates'
     file: '/test/sast.yml'
   - project: 'grandlinex/templates'
-    file: '/update/update-glx.yml''
+    file: '/update/update-glx.yml'
