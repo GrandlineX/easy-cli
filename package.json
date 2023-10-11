@@ -1,6 +1,6 @@
 {
-  "name": "@grandlinex/easy-script",
-  "version": "0.0.2",
+  "name": "@grandlinex/easy-cli",
+  "version": "0.0.3",
   "description": "Cli lib to perform common tasks",
   "main": "dist/index.js",
   "module": "dist/index.js",
