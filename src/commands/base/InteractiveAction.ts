@@ -1,11 +1,18 @@
 import fs from 'fs';
-import inquirer, { DistinctQuestion } from 'inquirer';
+
+import { confirm, editor, input, number, select } from '@inquirer/prompts';
 import {
   ShellCommand,
   ShellCommandParentProps,
 } from '../../class/ShellComand.js';
 import InteractionArgs from '../../class/InteractionArgs.js';
 import ArgUtil from '../../utils/ArgUtil.js';
+import {
+  getBoolOrUndefined,
+  getNumberOrUndefined,
+  getStringOrUndefined,
+  ParamTypeRaw,
+} from '../../lib/types.js';
 
 export default class InteractiveAction extends ShellCommand {
   constructor(props: ShellCommandParentProps) {
@@ -48,83 +55,157 @@ export default class InteractiveAction extends ShellCommand {
     const uParam = sel.properties.filter(
       ({ type, required }) => type !== 'null' || !required,
     );
-    const opt = uParam
-      .map<DistinctQuestion>((prop) => {
+
+    const validation = async (cnf: {
+      promise: () => Promise<ParamTypeRaw | undefined>;
+      after?: (data: ParamTypeRaw | undefined) => ParamTypeRaw | undefined;
+      validate?: (data: ParamTypeRaw) => boolean | string;
+    }) => {
+      const { promise, after, validate } = cnf;
+      let valid = false;
+      let data: ParamTypeRaw | undefined;
+
+      while (!valid) {
+        data = await promise();
+        if (validate && data !== undefined) {
+          const validated = validate(data);
+          if (validated === true) {
+            valid = true;
+          } else if (typeof validated === 'string') {
+            this.error(validated);
+          } else {
+            this.error('Invalid input');
+          }
+        } else {
+          valid = true;
+        }
+      }
+      if (after && data !== undefined) {
+        return after(data);
+      }
+      return data;
+    };
+    if (uParam.length > 0) {
+      const options: Record<string, any> = {};
+
+      // eslint-disable-next-line no-unreachable-loop
+      for (const prop of uParam) {
         switch (prop.type) {
           case 'null':
-            return {
-              name: prop.key,
-              type: 'confirm',
-              message: prop.description,
-              default: prop.default || false,
+            options[prop.key] = await validation({
+              promise: () =>
+                confirm({
+                  message: prop.description ?? prop.key,
+                  default: getBoolOrUndefined(prop.default, false),
+                }),
               validate: prop.validate,
-            };
+            });
+            break;
           case 'path':
-            return {
-              name: prop.key,
-              type: 'list',
-              message: prop.description,
-              choices: this.getFileOption(),
-              default: prop.default,
+            options[prop.key] = await validation({
+              promise: () =>
+                select({
+                  message: prop.description ?? prop.key,
+                  choices: this.getFileOption(),
+                  default: getStringOrUndefined(prop.default),
+                  pageSize: this.handler.getPageSize(),
+                }),
               validate: prop.validate,
-            };
+            });
+            break;
           case 'number':
-            return {
-              name: prop.key,
-              type: prop.editor ? 'editor' : 'input',
-              validate: (input) => {
-                if (prop.validate) {
-                  return prop.validate(input);
-                }
-                return (
-                  !prop.required ||
-                  (input.length > 0 && !Number.isNaN(Number(input)))
-                );
-              },
-              message: prop.description,
-              default: prop.default,
-            };
-          case 'string':
-            if (!prop.options)
-              return {
-                name: prop.key,
-                type: prop.editor ? 'editor' : 'input',
-                validate: (input) => {
+            if (prop.editor) {
+              options[prop.key] = await validation({
+                promise: () =>
+                  editor({
+                    message: prop.description ?? prop.key,
+                    default: getStringOrUndefined(prop.default),
+                  }),
+                validate: prop.validate,
+              });
+            } else {
+              options[prop.key] = await validation({
+                promise: () =>
+                  number({
+                    message: prop.description ?? prop.key,
+                    default: getNumberOrUndefined(prop.default),
+                  }),
+                validate: (ip: ParamTypeRaw) => {
                   if (prop.validate) {
-                    return prop.validate(input);
+                    return prop.validate(ip);
                   }
-                  return !prop.required || input.length > 0;
+                  return !prop.required || !Number.isNaN(Number(ip));
                 },
-                message: prop.description,
-                default: prop.default,
-              };
-            return {
-              name: prop.key,
-              type: 'list',
-              message: prop.description,
-              choices: prop.options.map((o) => ({
-                name: `${o.key} - ${o.description}`,
-                value: o.key,
-                disabled: false,
-              })),
-              default: prop.default,
-              validate: prop.validate,
-            };
-          default:
-            return {
-              name: 'actionSelect',
-              type: 'list',
-              message: 'Select your action',
-              choices: [],
-              default: prop.default,
-              validate: prop.validate,
-            };
-        }
-      })
-      .map((q) => ({ ...q, pageSize: this.handler.getPageSize() }));
+              });
+            }
+            break;
+          case 'string':
+            if (!prop.options) {
+              if (prop.editor) {
+                options[prop.key] = await validation({
+                  promise: () =>
+                    editor({
+                      message: prop.description ?? prop.key,
+                      default: getStringOrUndefined(prop.default),
+                    }),
+                  validate: (ip) => {
+                    if (prop.validate) {
+                      return prop.validate(ip);
+                    }
+                    return (
+                      !prop.required || getStringOrUndefined(ip, '')!.length > 0
+                    );
+                  },
+                });
+              } else {
+                options[prop.key] = await validation({
+                  promise: () =>
+                    input({
+                      message: prop.description ?? prop.key,
+                      default: getStringOrUndefined(prop.default),
+                    }),
+                  validate: (ip) => {
+                    if (prop.validate) {
+                      return prop.validate(ip);
+                    }
+                    return (
+                      !prop.required || getStringOrUndefined(ip, '')!.length > 0
+                    );
+                  },
+                });
+              }
+            } else {
+              options[prop.key] = await validation({
+                promise: () =>
+                  select({
+                    message: prop.description ?? prop.key,
+                    default: getStringOrUndefined(prop.default),
+                    choices:
+                      prop.options?.map((o) => ({
+                        name: `${o.key} - ${o.description}`,
+                        value: o.key,
+                        disabled: false,
+                      })) ?? [],
+                    pageSize: this.handler.getPageSize(),
+                  }),
+                validate: prop.validate,
+              });
+            }
 
-    if (opt.length > 0) {
-      const options = await inquirer.prompt(opt);
+            break;
+          default:
+            options[prop.key] = await validation({
+              promise: () =>
+                select({
+                  message: prop.description ?? prop.key,
+                  default: getStringOrUndefined(prop.default),
+                  choices: [],
+                  pageSize: this.handler.getPageSize(),
+                }),
+              validate: prop.validate,
+            });
+        }
+      }
       this.debug(JSON.stringify(options));
       uParam.forEach(({ key, type }) => {
         switch (type) {
@@ -160,9 +241,7 @@ export default class InteractiveAction extends ShellCommand {
   ): Promise<boolean> {
     args.cmd.push(cmd.name);
     if (cmd.subCommands.length > 0) {
-      const next = await inquirer.prompt({
-        name: 'actionSelect',
-        type: 'list',
+      const next = await select({
         message: `Select your action: > ${args.cmd.join(' > ')}`,
         pageSize: this.handler.getPageSize(),
         choices: cmd.subCommands.map((c) => ({
@@ -171,8 +250,8 @@ export default class InteractiveAction extends ShellCommand {
           disabled: false,
         })),
       });
-      const select = next.actionSelect;
-      const sel = cmd.subCommands.find((c) => c.name === select)!;
+
+      const sel = cmd.subCommands.find((c) => c.name === next)!;
       return this.checkForSubCmd(sel, args);
     }
     return this.runCmd(cmd, args);
@@ -180,9 +259,7 @@ export default class InteractiveAction extends ShellCommand {
 
   async run(): Promise<boolean> {
     const cmdList = this.handler.getCmds(true);
-    const cmd = await inquirer.prompt({
-      name: 'actionSelect',
-      type: 'list',
+    const cmd = await select({
       message: 'Select your action',
       pageSize: this.handler.getPageSize(),
       choices: cmdList
@@ -193,8 +270,8 @@ export default class InteractiveAction extends ShellCommand {
           disabled: false,
         })),
     });
-    const select = cmd.actionSelect;
-    const sel = cmdList.find((c) => c.name === select)!;
+
+    const sel = cmdList.find((c) => c.name === cmd)!;
 
     const args = new InteractionArgs();
     return this.checkForSubCmd(sel, args);
