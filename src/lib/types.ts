@@ -86,3 +86,33 @@ export type CmdProperty = {
     description?: string;
   }[];
 };
+
+export function getBoolOrUndefined(
+  val: unknown,
+  fallback: boolean | undefined = undefined,
+): boolean | undefined {
+  if (typeof val === 'boolean') {
+    return val;
+  }
+  return fallback;
+}
+
+export function getStringOrUndefined(
+  val: unknown,
+  fallback: string | undefined = undefined,
+): string | undefined {
+  if (typeof val === 'string') {
+    return val;
+  }
+  return fallback;
+}
+
+export function getNumberOrUndefined(
+  val: unknown,
+  fallback: number | undefined = undefined,
+): number | undefined {
+  if (typeof val === 'number') {
+    return val;
+  }
+  return fallback;
+}
