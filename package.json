@@ -35,7 +35,7 @@
   },
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@grandlinex/core": "1.0.0",
+    "@grandlinex/core": "1.0.1",
     "@inquirer/prompts": "5.3.5"
   },
   "devDependencies": {
