@@ -26,4 +26,8 @@ export default class InteractionArgs implements IArgs {
   getParameter<T = ParamTypeRaw | undefined>(key: string): T {
     return this.param.get(key) as T;
   }
+
+  getParameterNull(key: string): boolean {
+    return this.param.get(key) === null;
+  }
 }

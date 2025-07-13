@@ -13,10 +13,15 @@ export default class ArgUtil {
 
   static buildCmd(cmd: ShellCommand, args: IArgs) {
     const param = args.getParameters().map((value, key) => {
-      if (value === null) {
+      let val = value;
+      if (val === null) {
         return `--${key}`;
       }
-      return `--${key}=${value}`;
+      if (typeof val === 'string' && val.includes(' ')) {
+        // If the value is a string with spaces, wrap it in quotes
+        val = `"${val}"`;
+      }
+      return `--${key}=${val}`;
     });
     cmd.info(
       `CMD -> ${

@@ -3,6 +3,7 @@ import { ShellCommand } from '../class/ShellComand.js';
 
 export type ParamType = 'string' | 'number' | 'boolean' | 'path' | 'null';
 export type ParamTypeRaw = number | boolean | string | null;
+
 export interface IHandler {
   /**
    * Get the command list
@@ -41,30 +42,26 @@ export interface IArgs {
    */
   getParameters(): CMap<string, ParamTypeRaw>;
   /**
-   * Get the parameter map
+   * Get the parameter
    */
   getParameter<T extends ParamTypeRaw | undefined = ParamTypeRaw | undefined>(
     key: string,
   ): T;
+  /**
+   * Get the null parameter as a boolean
+   */
+  getParameterNull(key: string): boolean;
 }
 
-export type CmdProperty = {
+export type BaseCMDProperty = {
   /**
    * The key of the parameter
    */
   key: string;
   /**
-   * The type of the parameter
-   */
-  type: ParamType;
-  /**
    * Is the parameter required
    */
   required: boolean;
-  /**
-   * Open the editor for the parameter
-   */
-  editor?: boolean;
   /**
    * The description of the parameter
    */
@@ -72,7 +69,7 @@ export type CmdProperty = {
   /**
    * The default value of the parameter
    */
-  default?: ParamTypeRaw;
+  default?: ParamTypeRaw | (() => ParamTypeRaw);
   /**
    * Validate the parameter
    * @param input The input value
@@ -86,13 +83,51 @@ export type CmdProperty = {
     description?: string;
   }[];
 };
+export type SimpleCMDProp = BaseCMDProperty & {
+  type: 'boolean' | 'null';
+};
+export type NumberCMDProp = BaseCMDProperty & {
+  type: 'number';
+  /**
+   * Open the editor for the parameter
+   */
+  editor?: boolean;
+};
+export type StringCMDProp = BaseCMDProperty & {
+  type: 'string';
+  /**
+   * Open the editor for the parameter
+   */
+  editor?: boolean;
+  prefill?: 'tab' | 'editable';
+};
+export type PathCMDProp = BaseCMDProperty & {
+  type: 'path';
+  /**
+   * If true, the path is a file only
+   */
+  fileOnly?: boolean;
+  /**
+   * If true, the path is a directory only
+   */
+  dirOnly?: boolean;
+};
+export type CmdProperty =
+  | SimpleCMDProp
+  | PathCMDProp
+  | NumberCMDProp
+  | StringCMDProp;
 
 export function getBoolOrUndefined(
   val: unknown,
   fallback: boolean | undefined = undefined,
 ): boolean | undefined {
-  if (typeof val === 'boolean') {
-    return val;
+  let v = val;
+  if (typeof val === 'function') {
+    v = val();
+  }
+  if (typeof v === 'boolean') {
+    return v;
   }
   return fallback;
 }
@@ -101,8 +136,12 @@ export function getStringOrUndefined(
   val: unknown,
   fallback: string | undefined = undefined,
 ): string | undefined {
-  if (typeof val === 'string') {
-    return val;
+  let v = val;
+  if (typeof val === 'function') {
+    v = val();
+  }
+  if (typeof v === 'string') {
+    return v;
   }
   return fallback;
 }
@@ -111,8 +150,12 @@ export function getNumberOrUndefined(
   val: unknown,
   fallback: number | undefined = undefined,
 ): number | undefined {
-  if (typeof val === 'number') {
-    return val;
+  let v = val;
+  if (typeof val === 'function') {
+    v = val();
+  }
+  if (typeof v === 'number') {
+    return v;
   }
   return fallback;
 }

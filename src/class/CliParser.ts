@@ -44,13 +44,16 @@ export default class CliParser extends CoreLogChannel implements IArgs {
     }
     try {
       const n = Number(r);
-      if (Number.isNaN(n)) {
-        return [k.substring(2), r];
+      if (!Number.isNaN(n)) {
+        return [k.substring(2), n];
       }
-      return [k.substring(2), n];
     } catch (e) {
-      return [k.substring(2), r];
+      // ignore
     }
+    if (/^'.*'$/gm.test(r)) {
+      return [k.substring(2), r.substring(1, r.length - 1)];
+    }
+    return [k.substring(2), r];
   }
 
   /**
@@ -115,5 +118,13 @@ export default class CliParser extends CoreLogChannel implements IArgs {
    */
   getParameter<T = ParamTypeRaw | undefined>(key: string): T {
     return this.parameter.get(key) as T;
+  }
+
+  /**
+   * Get the null parameter as a boolean
+   * @param key
+   */
+  getParameterNull(key: string): boolean {
+    return this.parameter.get(key) === null;
   }
 }

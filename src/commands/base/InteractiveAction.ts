@@ -12,6 +12,7 @@ import {
   getNumberOrUndefined,
   getStringOrUndefined,
   ParamTypeRaw,
+  PathCMDProp,
 } from '../../lib/types.js';
 
 export default class InteractiveAction extends ShellCommand {
@@ -30,16 +31,37 @@ export default class InteractiveAction extends ShellCommand {
     });
   }
 
-  private getFileOption() {
+  private getFileOption(prop: PathCMDProp) {
     const path = this.resolvePath('.');
     const files = fs.readdirSync(path, { withFileTypes: true });
     return files
-      .filter((f) => f.isFile())
+      .filter((f) => {
+        if (prop.fileOnly) {
+          return f.isFile();
+        }
+        if (prop.dirOnly) {
+          return f.isDirectory();
+        }
+        return true;
+      })
       .map((f) => ({
-        name: `${f.name}`,
+        name:
+          !prop.fileOnly && !prop.dirOnly
+            ? `[${f.isFile() ? 'File' : 'Dir'}] ${f.name}`
+            : f.name,
         value: f.name,
         disabled: false,
-      }));
+        isDir: f.isDirectory(),
+      }))
+      .sort((a, b) => {
+        if (a.isDir && !b.isDir) {
+          return -1;
+        }
+        if (!a.isDir && b.isDir) {
+          return 1;
+        }
+        return a.name.localeCompare(b.name);
+      });
   }
 
   private async runCmd(
@@ -106,7 +128,7 @@ export default class InteractiveAction extends ShellCommand {
               promise: () =>
                 select({
                   message: prop.description ?? prop.key,
-                  choices: this.getFileOption(),
+                  choices: this.getFileOption(prop),
                   default: getStringOrUndefined(prop.default),
                   pageSize: this.handler.getPageSize(),
                 }),
@@ -163,6 +185,7 @@ export default class InteractiveAction extends ShellCommand {
                     input({
                       message: prop.description ?? prop.key,
                       default: getStringOrUndefined(prop.default),
+                      prefill: prop.prefill,
                     }),
                   validate: (ip) => {
                     if (prop.validate) {
