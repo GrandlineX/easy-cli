@@ -124,7 +124,7 @@ export async function getBoolOrUndefined(
 ): Promise<boolean | undefined> {
   let v = val;
   if (typeof val === 'function') {
-    v = val();
+    v = await val();
   }
   if (typeof v === 'boolean') {
     return v;
@@ -138,7 +138,7 @@ export async function getStringOrUndefined(
 ): Promise<string | undefined> {
   let v = val;
   if (typeof val === 'function') {
-    v = val();
+    v = await val();
   }
   if (typeof v === 'string') {
     return v;
@@ -152,7 +152,7 @@ export async function getNumberOrUndefined(
 ): Promise<number | undefined> {
   let v = val;
   if (typeof val === 'function') {
-    v = val();
+    v = await val();
   }
   if (typeof v === 'number') {
     return v;
