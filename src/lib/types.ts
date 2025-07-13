@@ -69,7 +69,7 @@ export type BaseCMDProperty = {
   /**
    * The default value of the parameter
    */
-  default?: ParamTypeRaw | (() => ParamTypeRaw);
+  default?: ParamTypeRaw | (() => Promise<ParamTypeRaw>);
   /**
    * Validate the parameter
    * @param input The input value
@@ -118,10 +118,10 @@ export type CmdProperty =
   | NumberCMDProp
   | StringCMDProp;
 
-export function getBoolOrUndefined(
+export async function getBoolOrUndefined(
   val: unknown,
   fallback: boolean | undefined = undefined,
-): boolean | undefined {
+): Promise<boolean | undefined> {
   let v = val;
   if (typeof val === 'function') {
     v = val();
@@ -132,10 +132,10 @@ export function getBoolOrUndefined(
   return fallback;
 }
 
-export function getStringOrUndefined(
+export async function getStringOrUndefined(
   val: unknown,
   fallback: string | undefined = undefined,
-): string | undefined {
+): Promise<string | undefined> {
   let v = val;
   if (typeof val === 'function') {
     v = val();
@@ -146,10 +146,10 @@ export function getStringOrUndefined(
   return fallback;
 }
 
-export function getNumberOrUndefined(
+export async function getNumberOrUndefined(
   val: unknown,
   fallback: number | undefined = undefined,
-): number | undefined {
+): Promise<number | undefined> {
   let v = val;
   if (typeof val === 'function') {
     v = val();

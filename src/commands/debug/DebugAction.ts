@@ -34,7 +34,7 @@ export default class DebugAction extends ShellCommand {
           key: 'string-default-function',
           type: 'string',
           required: false,
-          default: () => new Date().toISOString(),
+          default: async () => new Date().toISOString(),
           prefill: 'editable',
           editor: true,
         },

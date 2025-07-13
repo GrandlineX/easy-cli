@@ -115,10 +115,10 @@ export default class InteractiveAction extends ShellCommand {
         switch (prop.type) {
           case 'null':
             options[prop.key] = await validation({
-              promise: () =>
+              promise: async () =>
                 confirm({
                   message: prop.description ?? prop.key,
-                  default: getBoolOrUndefined(prop.default, false),
+                  default: await getBoolOrUndefined(prop.default, false),
                 }),
               validate: prop.validate,
             });
@@ -138,19 +138,19 @@ export default class InteractiveAction extends ShellCommand {
           case 'number':
             if (prop.editor) {
               options[prop.key] = await validation({
-                promise: () =>
+                promise: async () =>
                   editor({
                     message: prop.description ?? prop.key,
-                    default: getStringOrUndefined(prop.default),
+                    default: await getStringOrUndefined(prop.default),
                   }),
                 validate: prop.validate,
               });
             } else {
               options[prop.key] = await validation({
-                promise: () =>
+                promise: async () =>
                   number({
                     message: prop.description ?? prop.key,
-                    default: getNumberOrUndefined(prop.default),
+                    default: await getNumberOrUndefined(prop.default),
                   }),
                 validate: (ip: ParamTypeRaw) => {
                   if (prop.validate) {
@@ -165,35 +165,31 @@ export default class InteractiveAction extends ShellCommand {
             if (!prop.options) {
               if (prop.editor) {
                 options[prop.key] = await validation({
-                  promise: () =>
+                  promise: async () =>
                     editor({
                       message: prop.description ?? prop.key,
-                      default: getStringOrUndefined(prop.default),
+                      default: await getStringOrUndefined(prop.default),
                     }),
                   validate: (ip) => {
                     if (prop.validate) {
                       return prop.validate(ip);
                     }
-                    return (
-                      !prop.required || getStringOrUndefined(ip, '')!.length > 0
-                    );
+                    return !prop.required || ((ip as string) || '')!.length > 0;
                   },
                 });
               } else {
                 options[prop.key] = await validation({
-                  promise: () =>
+                  promise: async () =>
                     input({
                       message: prop.description ?? prop.key,
-                      default: getStringOrUndefined(prop.default),
+                      default: await getStringOrUndefined(prop.default),
                       prefill: prop.prefill,
                     }),
                   validate: (ip) => {
                     if (prop.validate) {
                       return prop.validate(ip);
                     }
-                    return (
-                      !prop.required || getStringOrUndefined(ip, '')!.length > 0
-                    );
+                    return !prop.required || ((ip as string) || '')!.length > 0;
                   },
                 });
               }
