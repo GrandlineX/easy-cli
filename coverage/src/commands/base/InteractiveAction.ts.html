@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/77</span>
+                <span class='fraction'>0/81</span>
             </div>
         
             
@@ -361,11 +361,7 @@
 <a name='L296'></a><a href='#L296'>296</a>
 <a name='L297'></a><a href='#L297'>297</a>
 <a name='L298'></a><a href='#L298'>298</a>
-<a name='L299'></a><a href='#L299'>299</a>
-<a name='L300'></a><a href='#L300'>300</a>
-<a name='L301'></a><a href='#L301'>301</a>
-<a name='L302'></a><a href='#L302'>302</a>
-<a name='L303'></a><a href='#L303'>303</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -545,8 +541,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -559,8 +553,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -784,10 +776,10 @@ export default class InteractiveAction extends ShellCommand {
 <span class="cstat-no" title="statement not covered" >        switch (prop.type) {</span>
           case 'null':
 <span class="cstat-no" title="statement not covered" >            options[prop.key] = await validation({</span>
-              promise: <span class="fstat-no" title="function not covered" >() =</span>&gt;
+              promise: <span class="fstat-no" title="function not covered" >async </span>() =&gt;
 <span class="cstat-no" title="statement not covered" >                confirm({</span>
                   message: prop.description ?? prop.key,
-                  default: getBoolOrUndefined(prop.default, false),
+                  default: await getBoolOrUndefined(prop.default, false),
                 }),
               validate: prop.validate,
             });
@@ -807,19 +799,19 @@ export default class InteractiveAction extends ShellCommand {
           case 'number':
 <span class="cstat-no" title="statement not covered" >            if (prop.editor) {</span>
 <span class="cstat-no" title="statement not covered" >              options[prop.key] = await validation({</span>
-                promise: <span class="fstat-no" title="function not covered" >() =</span>&gt;
+                promise: <span class="fstat-no" title="function not covered" >async </span>() =&gt;
 <span class="cstat-no" title="statement not covered" >                  editor({</span>
                     message: prop.description ?? prop.key,
-                    default: getStringOrUndefined(prop.default),
+                    default: await getStringOrUndefined(prop.default),
                   }),
                 validate: prop.validate,
               });
             } else {
 <span class="cstat-no" title="statement not covered" >              options[prop.key] = await validation({</span>
-                promise: <span class="fstat-no" title="function not covered" >() =</span>&gt;
+                promise: <span class="fstat-no" title="function not covered" >async </span>() =&gt;
 <span class="cstat-no" title="statement not covered" >                  number({</span>
                     message: prop.description ?? prop.key,
-                    default: getNumberOrUndefined(prop.default),
+                    default: await getNumberOrUndefined(prop.default),
                   }),
                 validate: <span class="fstat-no" title="function not covered" >(i</span>p: ParamTypeRaw) =&gt; {
 <span class="cstat-no" title="statement not covered" >                  <span class="missing-if-branch" title="if path not taken" >I</span>if (prop.validate) {</span>
@@ -834,35 +826,31 @@ export default class InteractiveAction extends ShellCommand {
 <span class="cstat-no" title="statement not covered" >            if (!prop.options) {</span>
 <span class="cstat-no" title="statement not covered" >              if (prop.editor) {</span>
 <span class="cstat-no" title="statement not covered" >                options[prop.key] = await validation({</span>
-                  promise: <span class="fstat-no" title="function not covered" >() =</span>&gt;
+                  promise: <span class="fstat-no" title="function not covered" >async </span>() =&gt;
 <span class="cstat-no" title="statement not covered" >                    editor({</span>
                       message: prop.description ?? prop.key,
-                      default: getStringOrUndefined(prop.default),
+                      default: await getStringOrUndefined(prop.default),
                     }),
                   validate: <span class="fstat-no" title="function not covered" >(i</span>p) =&gt; {
 <span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if (prop.validate) {</span>
 <span class="cstat-no" title="statement not covered" >                      return prop.validate(ip);</span>
                     }
-<span class="cstat-no" title="statement not covered" >                    return (</span>
-                      !prop.required || getStringOrUndefined(ip, '')!.length &gt; 0
-                    );
+<span class="cstat-no" title="statement not covered" >                    return !prop.required || ((ip as string) || '')!.length &gt; 0;</span>
                   },
                 });
               } else {
 <span class="cstat-no" title="statement not covered" >                options[prop.key] = await validation({</span>
-                  promise: <span class="fstat-no" title="function not covered" >() =</span>&gt;
+                  promise: <span class="fstat-no" title="function not covered" >async </span>() =&gt;
 <span class="cstat-no" title="statement not covered" >                    input({</span>
                       message: prop.description ?? prop.key,
-                      default: getStringOrUndefined(prop.default),
+                      default: await getStringOrUndefined(prop.default),
                       prefill: prop.prefill,
                     }),
                   validate: <span class="fstat-no" title="function not covered" >(i</span>p) =&gt; {
 <span class="cstat-no" title="statement not covered" >                    <span class="missing-if-branch" title="if path not taken" >I</span>if (prop.validate) {</span>
 <span class="cstat-no" title="statement not covered" >                      return prop.validate(ip);</span>
                     }
-<span class="cstat-no" title="statement not covered" >                    return (</span>
-                      !prop.required || getStringOrUndefined(ip, '')!.length &gt; 0
-                    );
+<span class="cstat-no" title="statement not covered" >                    return !prop.required || ((ip as string) || '')!.length &gt; 0;</span>
                   },
                 });
               }
@@ -976,7 +964,7 @@ export default class InteractiveAction extends ShellCommand {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-13T16:27:45.684Z
+                at 2025-07-13T16:46:22.950Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
