@@ -4,7 +4,7 @@ import { ShellCommand } from '../class/ShellComand.js';
 export type ParamType = 'string' | 'number' | 'boolean' | 'path' | 'null';
 export type ParamTypeRaw = number | boolean | string | null;
 
-export interface IHandler {
+export interface IHandler<X = any> {
   /**
    * Get the command list
    */
@@ -24,6 +24,15 @@ export interface IHandler {
    * Get the default interactive page size
    */
   getPageSize(): number | undefined;
+
+  /**
+   * function triggered when the command is ended
+   */
+  onEnd(): void;
+  /**
+   * get data from the command handler
+   */
+  getData(): X | null;
 }
 
 export interface IArgs {

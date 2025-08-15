@@ -16,9 +16,9 @@ import InteractiveAction from './commands/base/InteractiveAction.js';
 import ArgUtil from './utils/ArgUtil.js';
 import InteractionArgs from './class/InteractionArgs.js';
 
-export default abstract class CommandHandler
+export default abstract class CommandHandler<X = any>
   extends CoreLogChannel
-  implements IHandler
+  implements IHandler<X>
 {
   private baseCmd: CMap<string, ShellCommand>;
 
@@ -34,14 +34,18 @@ export default abstract class CommandHandler
 
   private readonly cmdName: string;
 
+  private readonly data: X | null;
+
   protected constructor(cnf?: {
     isDev?: boolean;
     defaultInteractive?: boolean;
     logger?: CoreLogger;
     cmdName?: string;
     pageSize?: number;
+    data?: X | null;
   }) {
     super(cnf?.cmdName || 'easy-script', cnf?.logger || new DefaultLogger());
+    this.data = cnf?.data || null;
     this.cmdName = cnf?.cmdName || 'easy-script';
     this.dev = cnf?.isDev || false;
     this.pageSize = cnf?.pageSize || 6;
@@ -89,6 +93,7 @@ export default abstract class CommandHandler
 
   async run(iArgs?: InteractionArgs): Promise<void> {
     this.debug(`Startup: v${getVersion()}`);
+    await this.onStart();
     try {
       const cmds = this.getCmds(true);
       const args: IArgs = iArgs || new CliParser(this.logger);
@@ -135,6 +140,18 @@ export default abstract class CommandHandler
       );
       process.exit(1);
     }
+  }
+
+  async onStart(): Promise<void> {
+    this.verbose('CommandHandler started');
+  }
+
+  onEnd(): void {
+    this.verbose('CommandHandler ended');
+  }
+
+  getData(): X | null {
+    return this.data;
   }
 
   isDev(): boolean {

@@ -15,14 +15,14 @@ export type ShellCommandProps = {
   subCommands?: ShellCommand[];
   level?: number;
 } & ShellCommandParentProps;
-export abstract class ShellCommand extends CoreLogChannel {
+export abstract class ShellCommand<T = any> extends CoreLogChannel {
   name: string;
 
   level: number;
 
   description: string;
 
-  handler: IHandler;
+  handler: IHandler<T>;
 
   properties: CmdProperty[];
 
@@ -76,7 +76,9 @@ export abstract class ShellCommand extends CoreLogChannel {
       throw this.lError(`Unknown Sub-Command ${parser.getCmdList().join(' ')}`);
     }
     await this.validateFields(parser);
-    return this.run(parser);
+    const ext = await this.run(parser);
+    this.handler.onEnd();
+    return ext;
   }
   abstract run(parser: IArgs): Promise<boolean>;
 
