@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage lines-valid="350" lines-covered="42" line-rate="0.12" branches-valid="187" branches-covered="16" branch-rate="0.0855" timestamp="1755257086477" complexity="0" version="0.1">
+<coverage lines-valid="350" lines-covered="42" line-rate="0.12" branches-valid="187" branches-covered="16" branch-rate="0.0855" timestamp="1757958119091" complexity="0" version="0.1">
   <sources>
     <source>/home/runner/work/easy-cli/easy-cli</source>
   </sources>
