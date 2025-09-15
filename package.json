@@ -1,6 +1,6 @@
 {
   "name": "@grandlinex/easy-cli",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Cli lib to perform common tasks",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -36,8 +36,8 @@
   },
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@grandlinex/core": "1.0.1",
-    "@inquirer/prompts": "7.6.0",
+    "@grandlinex/core": "1.2.0",
+    "@inquirer/prompts": "7.8.6",
     "moment": "2.30.1"
   },
   "devDependencies": {
