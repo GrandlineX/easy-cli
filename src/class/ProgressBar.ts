@@ -6,6 +6,8 @@ function p(num: number) {
 }
 
 export default class ProgressBar {
+  private maxLength = 0;
+
   private startDate: Date;
 
   private lastDate: Date | null = null;
@@ -22,14 +24,26 @@ export default class ProgressBar {
     this.end = end;
   }
 
+  reset() {
+    this.startDate = new Date();
+    this.cur = 0;
+    this.lastDate = null;
+  }
+
   setEnd(end: number) {
     this.end = end;
     this.update();
   }
 
-  setState(cur: number, info: string | null) {
-    this.cur = cur;
+  setInfo(info: string | null) {
     this.info = info;
+  }
+
+  setState(cur: number, info?: string | null) {
+    this.cur = cur;
+    if (info !== undefined) {
+      this.info = info;
+    }
     this.update();
   }
 
@@ -57,7 +71,12 @@ export default class ProgressBar {
         bar += ' ';
       }
     }
-    const txt = `Processing: [${bar}] ${perc.toFixed(2)}%${time}${this.info}`;
+    let txt = `Processing: [${bar}] ${perc.toFixed(2)}%${time}${this.info || ''}`;
+    if (txt.length > this.maxLength) {
+      this.maxLength = txt.length;
+    }
+    txt = txt.padEnd(this.maxLength, ' ');
+
     process.stdout.write(`${txt}\r`);
     this.lastDate = curDate;
   }
