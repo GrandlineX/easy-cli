@@ -1,11 +1,9 @@
 import Path from 'path';
 import * as fs from 'fs';
-import * as url from 'url';
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 export default function getVersion(): string {
   const parentFile = Path.join(
-    __dirname,
+    import.meta.dirname,
     '..',
     '..',
     '..',
@@ -13,7 +11,7 @@ export default function getVersion(): string {
     '..',
     'package.json',
   );
-  const file = Path.join(__dirname, '..', '..', 'package.json');
+  const file = Path.join(import.meta.dirname, '..', '..', 'package.json');
 
   let pck;
   if (fs.existsSync(parentFile)) {

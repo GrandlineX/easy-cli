@@ -92,4 +92,8 @@ export abstract class ShellCommand<T = any> extends CoreLogChannel {
     }
     return absPath;
   }
+
+  protected getStatic(key: string): string | undefined {
+    return this.handler.getStatic(key);
+  }
 }

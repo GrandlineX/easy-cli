@@ -20,6 +20,8 @@ export default abstract class CommandHandler<X = any>
   extends CoreLogChannel
   implements IHandler<X>
 {
+  private statics: CMap<string, string>;
+
   private baseCmd: CMap<string, ShellCommand>;
 
   private cmdMap: CMap<string, ShellCommand>;
@@ -58,12 +60,24 @@ export default abstract class CommandHandler<X = any>
     this.logger = l;
     this.cmdMap = new CMap();
     this.baseCmd = new CMap();
+    this.statics = new CMap();
     const props = { logger: this.logger, handler: this };
     this.addBaseCmd(
       new HelpAction(props),
       new InteractiveAction(props),
       new VersionAction(props),
     );
+  }
+
+  setStatic(key: string, value: any): void {
+    this.statics.set(key, value);
+  }
+
+  getStatic(key: string): string {
+    if (!this.statics.has(key)) {
+      throw this.lError(`Static key ${key} not found`);
+    }
+    return this.statics.get(key)!;
   }
 
   getCmdName(): string {

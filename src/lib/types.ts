@@ -33,6 +33,18 @@ export interface IHandler<X = any> {
    * get data from the command handler
    */
   getData(): X | null;
+
+  /**
+   * Set a static value
+   * @param key
+   * @param value
+   */
+  setStatic(key: string, value: any): void;
+  /**
+   *
+   * @param key
+   */
+  getStatic(key: string): string;
 }
 
 export interface IArgs {
