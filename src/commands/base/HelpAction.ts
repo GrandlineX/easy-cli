@@ -3,6 +3,7 @@ import {
   ShellCommandParentProps,
 } from '../../class/ShellComand.js';
 import getVersion from '../../utils/Version.js';
+import { StricktOption } from '../../lib/types.js';
 
 export default class HelpAction extends ShellCommand {
   constructor(props: ShellCommandParentProps) {
@@ -24,41 +25,45 @@ export default class HelpAction extends ShellCommand {
     return '  '.repeat(n);
   }
 
-  private inspectCmd(c: ShellCommand): void {
+  private async inspectCmd(c: ShellCommand) {
     this.info(`${this.space(c.level + 1)}${c.name}: ${c.description}`);
-    c.properties.forEach(({ key, type, required, description, options }) => {
-      let t;
-      switch (type) {
-        case 'string':
-          if (!options) {
-            t = `<${type}>`;
-          } else {
-            t = `<option>`;
+    await Promise.all(
+      c.properties.map(
+        async ({ key, type, required, description, options }) => {
+          let t;
+          switch (type) {
+            case 'string':
+              if (!options) {
+                t = `<${type}>`;
+              } else {
+                t = `<option>`;
+              }
+              break;
+            case 'null':
+              t = '';
+              break;
+            default:
+              t = `<${type}>`;
           }
-          break;
-        case 'null':
-          t = '';
-          break;
-        default:
-          t = `<${type}>`;
-      }
-      this.info(
-        `${this.space(c.level + 2)}--${key} ${t} ${
-          required ? '(required)' : '(optional)'
-        } ${description ? `: ${description}` : ''}`,
-      );
-      if (options) {
-        this.info(`${this.space(c.level + 3)} Options:`);
-        options.forEach((o) => {
           this.info(
-            `${this.space(c.level + 4)}${o.key}${
-              o.description ? ` : ${o.description}` : ''
-            }`,
+            `${this.space(c.level + 2)}--${key} ${t} ${
+              required ? '(required)' : '(optional)'
+            } ${description ? `: ${description}` : ''}`,
           );
-        });
-      }
-    });
-    c.subCommands.forEach((cmd) => this.inspectCmd(cmd));
+          if (options) {
+            this.info(`${this.space(c.level + 3)} Options:`);
+            (await StricktOption(options, this.handler)).forEach((o) => {
+              this.info(
+                `${this.space(c.level + 4)}${o.key}${
+                  o.description ? ` : ${o.description}` : ''
+                }`,
+              );
+            });
+          }
+        },
+      ),
+    );
+    await Promise.all(c.subCommands.map((cmd) => this.inspectCmd(cmd)));
     if (c.level === 0) this.info('---------------------------------');
   }
 
@@ -69,7 +74,9 @@ export default class HelpAction extends ShellCommand {
       `Usage: ${this.handler.getCmdName()} <command> [...<sub-command>]  [options]`,
     );
     this.info('---------------------------------');
-    this.handler.getCmds(true).forEach((c) => this.inspectCmd(c));
+    await Promise.all(
+      this.handler.getCmds(true).map((c) => this.inspectCmd(c)),
+    );
     return true;
   }
 }

@@ -13,6 +13,7 @@ import {
   getStringOrUndefined,
   ParamTypeRaw,
   PathCMDProp,
+  StricktOption,
 } from '../../lib/types.js';
 
 export default class InteractiveAction extends ShellCommand {
@@ -195,18 +196,22 @@ export default class InteractiveAction extends ShellCommand {
               }
             } else {
               options[prop.key] = await validation({
-                promise: () =>
-                  select({
+                promise: async () => {
+                  const option = prop.options
+                    ? await StricktOption(prop.options, this.handler)
+                    : undefined;
+                  return select({
                     message: prop.description ?? prop.key,
                     default: getStringOrUndefined(prop.default),
                     choices:
-                      prop.options?.map((o) => ({
+                      option?.map((o) => ({
                         name: `${o.key} - ${o.description}`,
                         value: o.key,
                         disabled: false,
                       })) ?? [],
                     pageSize: this.handler.getPageSize(),
-                  }),
+                  });
+                },
                 validate: prop.validate,
               });
             }

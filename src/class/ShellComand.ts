@@ -1,7 +1,13 @@
 import Path from 'path';
 import fs from 'fs';
 import { CoreLogChannel, CoreLogger } from '@grandlinex/core';
-import { CmdProperty, IArgs, IHandler, ParamTypeRaw } from '../lib/types.js';
+import {
+  CmdProperty,
+  IArgs,
+  IHandler,
+  ParamTypeRaw,
+  StricktOption,
+} from '../lib/types.js';
 import ArgUtil from '../utils/ArgUtil.js';
 
 export type ShellCommandParentProps = {
@@ -52,7 +58,11 @@ export abstract class ShellCommand<T = any> extends CoreLogChannel {
       if (required && ArgUtil.checkParameterType(args, key) === null) {
         throw this.lError(`Parameter --${key} is not set but required`);
       }
-      if (options && p !== undefined && !options.find((o) => o.key === p)) {
+      if (
+        options &&
+        p !== undefined &&
+        !(await StricktOption(options, this.handler)).find((o) => o.key === p)
+      ) {
         throw this.lError(`Parameter --${key} has invalid option ${p}`);
       }
     }

@@ -74,6 +74,19 @@ export interface IArgs {
   getParameterNull(key: string): boolean;
 }
 
+export type BaseCMDOptionEl = {
+  key: ParamTypeRaw;
+  description?: string;
+};
+export type BaseCMDOption =
+  | ((handler: IHandler) => Promise<BaseCMDOptionEl[]>)
+  | BaseCMDOptionEl[];
+export async function StricktOption(option: BaseCMDOption, handler: IHandler) {
+  if (typeof option === 'function') {
+    return option(handler);
+  }
+  return option;
+}
 export type BaseCMDProperty = {
   /**
    * The key of the parameter
@@ -99,10 +112,7 @@ export type BaseCMDProperty = {
   /**
    * The options of the parameter
    */
-  options?: {
-    key: ParamTypeRaw;
-    description?: string;
-  }[];
+  options?: BaseCMDOption;
 };
 export type SimpleCMDProp = BaseCMDProperty & {
   type: 'boolean' | 'null';
