@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/104</span>
+                <span class='fraction'>0/105</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/81</span>
+                <span class='fraction'>0/83</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/102</span>
+                <span class='fraction'>0/103</span>
             </div>
         
             
@@ -361,7 +361,12 @@
 <a name='L296'></a><a href='#L296'>296</a>
 <a name='L297'></a><a href='#L297'>297</a>
 <a name='L298'></a><a href='#L298'>298</a>
-<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -380,6 +385,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -553,17 +559,21 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -674,6 +684,7 @@ import {
   getStringOrUndefined,
   ParamTypeRaw,
   PathCMDProp,
+  StricktOption,
 } from '../../lib/types.js';
 &nbsp;
 export default class InteractiveAction extends ShellCommand {
@@ -856,18 +867,22 @@ export default class InteractiveAction extends ShellCommand {
               }
             } else {
 <span class="cstat-no" title="statement not covered" >              options[prop.key] = await validation({</span>
-                promise: <span class="fstat-no" title="function not covered" >() =</span>&gt;
-<span class="cstat-no" title="statement not covered" >                  select({</span>
+                promise: <span class="fstat-no" title="function not covered" >async </span>() =&gt; {
+                  const option = <span class="cstat-no" title="statement not covered" >prop.options</span>
+                    ? await StricktOption(prop.options, this.handler)
+                    : undefined;
+<span class="cstat-no" title="statement not covered" >                  return select({</span>
                     message: prop.description ?? prop.key,
                     default: getStringOrUndefined(prop.default),
                     choices:
-                      prop.options?.map(<span class="fstat-no" title="function not covered" >(o</span>) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+                      option?.map(<span class="fstat-no" title="function not covered" >(o</span>) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
                         name: `${o.key} - ${o.description}`,
                         value: o.key,
                         disabled: false,
                       })) ?? [],
                     pageSize: this.handler.getPageSize(),
-                  }),
+                  });
+                },
                 validate: prop.validate,
               });
             }
@@ -964,7 +979,7 @@ export default class InteractiveAction extends ShellCommand {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-18T21:42:06.162Z
+                at 2026-02-19T02:25:04.338Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
