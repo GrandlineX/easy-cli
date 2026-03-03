@@ -126,11 +126,11 @@ export default class InteractiveAction extends ShellCommand {
             break;
           case 'path':
             options[prop.key] = await validation({
-              promise: () =>
-                select({
+              promise: async () =>
+                select<string>({
                   message: prop.description ?? prop.key,
                   choices: this.getFileOption(prop),
-                  default: getStringOrUndefined(prop.default),
+                  default: await getStringOrUndefined(prop.default),
                   pageSize: this.handler.getPageSize(),
                 }),
               validate: prop.validate,
@@ -200,13 +200,13 @@ export default class InteractiveAction extends ShellCommand {
                   const option = prop.options
                     ? await StricktOption(prop.options, this.handler)
                     : undefined;
-                  return select({
+                  return select<string>({
                     message: prop.description ?? prop.key,
-                    default: getStringOrUndefined(prop.default),
+                    default: await getStringOrUndefined(prop.default),
                     choices:
                       option?.map((o) => ({
                         name: `${o.key} - ${o.description}`,
-                        value: o.key,
+                        value: o.key as string,
                         disabled: false,
                       })) ?? [],
                     pageSize: this.handler.getPageSize(),
@@ -219,10 +219,10 @@ export default class InteractiveAction extends ShellCommand {
             break;
           default:
             options[prop.key] = await validation({
-              promise: () =>
-                select({
+              promise: async () =>
+                select<string>({
                   message: prop.description ?? prop.key,
-                  default: getStringOrUndefined(prop.default),
+                  default: await getStringOrUndefined(prop.default),
                   choices: [],
                   pageSize: this.handler.getPageSize(),
                 }),
