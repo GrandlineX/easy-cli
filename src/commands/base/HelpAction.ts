@@ -63,7 +63,9 @@ export default class HelpAction extends ShellCommand {
         },
       ),
     );
-    await Promise.all(c.subCommands.map((cmd) => this.inspectCmd(cmd)));
+    for (const cmd of c.subCommands) {
+      await this.inspectCmd(cmd);
+    }
     if (c.level === 0) this.info('---------------------------------');
   }
 
@@ -74,9 +76,9 @@ export default class HelpAction extends ShellCommand {
       `Usage: ${this.handler.getCmdName()} <command> [...<sub-command>]  [options]`,
     );
     this.info('---------------------------------');
-    await Promise.all(
-      this.handler.getCmds(true).map((c) => this.inspectCmd(c)),
-    );
+    for (const c of this.handler.getCmds(true)) {
+      await this.inspectCmd(c);
+    }
     return true;
   }
 }

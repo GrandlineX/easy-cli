@@ -62,13 +62,14 @@ export default class DebugAction extends ShellCommand {
     const progress = parser.getParameterNull('progress');
     ArgUtil.printDebug(this, parser);
     if (progress) {
-      const bar = new ProgressBar(10);
+      const bar = new ProgressBar(100);
       let count = 0;
-      while (count !== 10) {
-        bar.setState(count, ` ${count}/10`);
+      while (count <= 100) {
+        bar.setState(count, ` ${count}/100`);
         count++;
-        await XUtil.sleep(1000);
+        await XUtil.sleep(500);
       }
+      bar.done();
     }
 
     return true;

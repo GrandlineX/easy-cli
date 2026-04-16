@@ -1,16 +1,37 @@
-import moment from 'moment';
 import process from 'process';
 
-function p(num: number) {
-  return num < 10 ? `0${num}` : `${num}`;
+function clamp(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, n));
+}
+
+function pad2(n: number): string {
+  return n < 10 ? `0${n}` : `${n}`;
+}
+
+function formatDuration(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSec / 60);
+  const seconds = totalSec % 60;
+  return `${pad2(minutes)}:${pad2(seconds)}`;
+}
+
+function stripAnsi(input: string): string {
+  // Remove ANSI escape sequences so padEnd uses visible text length.
+  // eslint-disable-next-line no-control-regex
+  return input.replace(/\x1b\[[0-9;]*m/g, '');
+}
+
+function color(enabled: boolean, code: string, text: string): string {
+  if (!enabled) {
+    return text;
+  }
+  return `\x1b[${code}m${text}\x1b[0m`;
 }
 
 export default class ProgressBar {
   private maxLength = 0;
 
-  private startDate: Date;
-
-  private lastDate: Date | null = null;
+  private startMs: number;
 
   private cur: number;
 
@@ -18,28 +39,51 @@ export default class ProgressBar {
 
   private info: string | null = null;
 
+  private readonly width = 36;
+
+  private frameIndex = 0;
+
+  private readonly frames = ['|', '/', '-', '\\'];
+
+  private readonly unicodeFrames = [
+    '⠋',
+    '⠙',
+    '⠹',
+    '⠸',
+    '⠼',
+    '⠴',
+    '⠦',
+    '⠧',
+    '⠇',
+    '⠏',
+  ];
+
+  private readonly colorEnabled = Boolean(process.stdout.isTTY);
+
   constructor(end: number = 1) {
-    this.startDate = new Date();
+    this.startMs = Date.now();
     this.cur = 0;
     this.end = end;
   }
 
-  reset() {
-    this.startDate = new Date();
+  reset(): void {
+    this.startMs = Date.now();
     this.cur = 0;
-    this.lastDate = null;
+    this.maxLength = 0;
+    this.frameIndex = 0;
+    this.info = null;
   }
 
-  setEnd(end: number) {
+  setEnd(end: number): void {
     this.end = end;
     this.update();
   }
 
-  setInfo(info: string | null) {
+  setInfo(info: string | null): void {
     this.info = info;
   }
 
-  setState(cur: number, info?: string | null) {
+  setState(cur: number, info?: string | null): void {
     this.cur = cur;
     if (info !== undefined) {
       this.info = info;
@@ -47,37 +91,64 @@ export default class ProgressBar {
     this.update();
   }
 
-  private update() {
-    const perc = (this.cur / this.end) * 100;
-    const int = Math.trunc(perc);
-    const dev = int;
+  done(): void {
+    this.cur = this.end;
+    const line = this.renderLine(true);
+    process.stdout.write(`${line}\r\n`);
+  }
 
-    const curDate = new Date();
-    const curSec = curDate.getTime() - this.startDate.getTime();
-    const cur = moment.duration(curSec, 'millisecond');
-    let time = '';
-    if (this.lastDate !== null && perc > 0) {
-      const p1 = curSec / perc;
-      const e = moment.duration(p1 * 100, 'millisecond');
-      time = ` (${p(Math.trunc(cur.asMinutes()))}:${p(cur.seconds())}/${p(
-        Math.trunc(e.asMinutes()),
-      )}:${p(e.seconds())})`;
-    }
-    let bar = '';
-    for (let j = 0; j < 100; j += 1) {
-      if (j < dev) {
-        bar += '#';
-      } else {
-        bar += ' ';
-      }
-    }
-    let txt = `Processing: [${bar}] ${perc.toFixed(2)}%${time}${this.info || ''}`;
-    if (txt.length > this.maxLength) {
-      this.maxLength = txt.length;
-    }
-    txt = txt.padEnd(this.maxLength, ' ');
+  private renderLine(isDone: boolean): string {
+    const safeEnd = this.end <= 0 ? 1 : this.end;
+    const curClamped = clamp(this.cur, 0, safeEnd);
+    const ratio = clamp(curClamped / safeEnd, 0, 1);
+    const perc = ratio * 100;
 
-    process.stdout.write(`${txt}\r`);
-    this.lastDate = curDate;
+    const elapsedMs = Date.now() - this.startMs;
+    const etaMs = ratio > 0 ? elapsedMs / ratio - elapsedMs : 0;
+    const speed = elapsedMs > 0 ? curClamped / (elapsedMs / 1000) : 0;
+
+    const filled = Math.round(this.width * ratio);
+    const empty = this.width - filled;
+
+    const fillChar = this.colorEnabled ? '█' : '#';
+    const emptyChar = this.colorEnabled ? '░' : '-';
+
+    const donePart = fillChar.repeat(filled);
+    const todoPart = emptyChar.repeat(empty);
+
+    const bar = this.colorEnabled
+      ? `${color(true, '32', donePart)}${color(true, '90', todoPart)}`
+      : `${donePart}${todoPart}`;
+
+    const spinnerFrames = this.colorEnabled ? this.unicodeFrames : this.frames;
+    const frame = isDone
+      ? '✓'
+      : spinnerFrames[this.frameIndex % spinnerFrames.length];
+    this.frameIndex += 1;
+
+    const status = isDone
+      ? color(this.colorEnabled, '32', 'Done')
+      : color(this.colorEnabled, '36', 'Working');
+
+    const timeText = `${formatDuration(elapsedMs)}/${formatDuration(etaMs)}`;
+    const infoText = this.info ? ` ${this.info}` : '';
+
+    let line = `${frame} ${status} [${bar}] ${perc.toFixed(1)}% (${timeText}) ${speed.toFixed(1)}/s${infoText}`;
+
+    const visibleLen = stripAnsi(line).length;
+    if (visibleLen > this.maxLength) {
+      this.maxLength = visibleLen;
+    }
+
+    // Pad based on visible text length, not raw string length with ANSI.
+    const padSpaces = Math.max(0, this.maxLength - visibleLen);
+    line = `${line}${' '.repeat(padSpaces)}`;
+
+    return line;
+  }
+
+  private update(): void {
+    const line = this.renderLine(false);
+    process.stdout.write(`${line}\r`);
   }
 }
