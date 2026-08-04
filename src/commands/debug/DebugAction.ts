@@ -1,11 +1,10 @@
-import { XUtil } from '@grandlinex/core';
+import { ProgressBar, XUtil } from '@grandlinex/core';
 import {
   ShellCommand,
   ShellCommandParentProps,
 } from '../../class/ShellComand.js';
 import { IArgs } from '../../lib/types.js';
 import ArgUtil from '../../utils/ArgUtil.js';
-import ProgressBar from '../../class/ProgressBar.js';
 
 export default class DebugAction extends ShellCommand {
   constructor(props: ShellCommandParentProps) {
