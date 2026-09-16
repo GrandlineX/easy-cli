@@ -1,5 +1,5 @@
 import { CoreLogChannel } from '@grandlinex/core';
-import { IArgs, ParamType } from '../lib/types.js';
+import type { IArgs, ParamType } from '../lib/types.js';
 import { ShellCommand } from '../class/ShellComand.js';
 
 export default class ArgUtil {

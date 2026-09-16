@@ -1,9 +1,9 @@
 import {
   ShellCommand,
-  ShellCommandParentProps,
+  type ShellCommandParentProps,
 } from '../../class/ShellComand.js';
 import getVersion from '../../utils/Version.js';
-import { IArgs } from '../../lib/types.js';
+import type { IArgs } from '../../lib/types.js';
 
 export default class VersionAction extends ShellCommand {
   constructor(props: ShellCommandParentProps) {

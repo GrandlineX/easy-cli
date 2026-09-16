@@ -9,7 +9,7 @@ import {
 import getVersion from './utils/Version.js';
 import CliParser from './class/CliParser.js';
 import { ShellCommand } from './class/ShellComand.js';
-import { IArgs, IHandler } from './lib/types.js';
+import type { IArgs, IHandler } from './lib/types.js';
 import HelpAction from './commands/base/HelpAction.js';
 import VersionAction from './commands/base/VersionAction.js';
 import InteractiveAction from './commands/base/InteractiveAction.js';

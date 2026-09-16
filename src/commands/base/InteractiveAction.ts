@@ -3,7 +3,7 @@ import fs from 'fs';
 import { confirm, editor, input, number, select } from '@inquirer/prompts';
 import {
   ShellCommand,
-  ShellCommandParentProps,
+  type ShellCommandParentProps,
 } from '../../class/ShellComand.js';
 import InteractionArgs from '../../class/InteractionArgs.js';
 import ArgUtil from '../../utils/ArgUtil.js';
@@ -11,8 +11,8 @@ import {
   getBoolOrUndefined,
   getNumberOrUndefined,
   getStringOrUndefined,
-  ParamTypeRaw,
-  PathCMDProp,
+  type ParamTypeRaw,
+  type PathCMDProp,
   StricktOption,
 } from '../../lib/types.js';
 

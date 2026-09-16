@@ -2,10 +2,10 @@ import Path from 'path';
 import fs from 'fs';
 import { CoreLogChannel, CoreLogger } from '@grandlinex/core';
 import {
-  CmdProperty,
-  IArgs,
-  IHandler,
-  ParamTypeRaw,
+  type CmdProperty,
+  type IArgs,
+  type IHandler,
+  type ParamTypeRaw,
   StricktOption,
 } from '../lib/types.js';
 import ArgUtil from '../utils/ArgUtil.js';

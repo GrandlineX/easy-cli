@@ -1,5 +1,5 @@
 import { CMap } from '@grandlinex/core';
-import { IArgs, ParamTypeRaw } from '../lib/types.js';
+import type { IArgs, ParamTypeRaw } from '../lib/types.js';
 
 export default class InteractionArgs implements IArgs {
   cmd: string[];

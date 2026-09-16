@@ -26,3 +26,6 @@ junit.xml
 CHANGELOG.md
 tsconfig.json
 tsconfig-cjs.json
+vitest.config.ts
+easy-cli.iml
+tsdown.config.ts

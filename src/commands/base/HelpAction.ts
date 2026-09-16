@@ -1,6 +1,6 @@
 import {
   ShellCommand,
-  ShellCommandParentProps,
+  type ShellCommandParentProps,
 } from '../../class/ShellComand.js';
 import getVersion from '../../utils/Version.js';
 import { StricktOption } from '../../lib/types.js';

@@ -1,5 +1,5 @@
 import { CMap, CoreLogChannel, CoreLogger } from '@grandlinex/core';
-import { IArgs, ParamTypeRaw } from '../lib/types.js';
+import type { IArgs, ParamTypeRaw } from '../lib/types.js';
 
 export default class CliParser extends CoreLogChannel implements IArgs {
   private readonly parameter: CMap<string, ParamTypeRaw>;

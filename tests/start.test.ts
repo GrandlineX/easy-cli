@@ -1,6 +1,6 @@
 import { DefaultLogger, LogLevel } from '@grandlinex/core';
-import CliParser from '../class/CliParser.js';
-import ArgUtil from '../utils/ArgUtil.js';
+import { describe, test, expect} from "vitest"
+import {ArgUtil, CliParser} from "../src";
 
 const logger = new DefaultLogger();
 logger.setLogLevel(LogLevel.VERBOSE);

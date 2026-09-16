@@ -22,9 +22,6 @@ jobs:
       - name: Create the docs directory locally in CI
         run: npm run makeDocs
 
-      - name: Add testreport to docs folder
-        run: npm run doc-converage
-
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
