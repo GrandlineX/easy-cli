@@ -1,6 +1,6 @@
 {
   "name": "@grandlinex/easy-cli",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Cli lib to perform common tasks",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -21,14 +21,14 @@
     }
   },
   "scripts": {
-    "buildprep": "tsc",
-    "pack": "npm run buildprep && npm pack",
+    "build": "tsc",
+    "pack": "npm run build && npm pack",
     "lint": "eslint src",
     "interactive": "tsx src/cli.ts --interactive",
     "progress": "tsx src/cli.ts debug --progress",
     "debug": "tsx src/cli.ts debug --string-field=\"1234 abcs\"",
-    "test-converage": "jest --runInBand --ci --collectCoverage   --coverageDirectory=\"./coverage\"  --reporters=default --reporters=jest-junit",
-    "doc-converage": "jest --runInBand --ci --collectCoverage   --coverageDirectory=\"./docs/coverage\"  --reporters=default --reporters=jest-junit",
+    "test-coverage": "jest --runInBand --ci --collectCoverage   --coverageDirectory=\"./coverage\"  --reporters=default --reporters=jest-junit",
+    "doc-coverage": "jest --runInBand --ci --collectCoverage   --coverageDirectory=\"./docs/coverage\"  --reporters=default --reporters=jest-junit",
     "help": "tsx src/cli.ts --help",
     "makeDocs": "typedoc"
   },
